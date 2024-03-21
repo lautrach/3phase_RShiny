@@ -14,6 +14,7 @@ library(splines)
 library(pbmcapply)
 library(ggmap)
 
+
 preprocess_data = function(year){
   #Reading the data
   path = paste("WNV data by year - Anwesha/",year,".csv",sep = "")

@@ -30,7 +30,11 @@ ui <- dashboardPage(
       #PHASE 1
       tabItem(tabName = "phase1",
               h2("Phase 1"),
-              p("Content for Phase 1...")
+              p("Content for Phase 1..."),
+              selectInput("selection", "Choose an option:",
+                          choices = c("Specificity Values(1062 traps) " = "specificity1",
+                                      "Sensitivity Values(326 traps)" = "sensitivity",
+                                      "Specificity Values(326 traps)" = "specificity2"))
       ),
       #PHASE 2
       tabItem(tabName = "phase2",
