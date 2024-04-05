@@ -1,8 +1,8 @@
 #app.R
 library(shiny)
 library(shinydashboard)
-#TODO 1: Need to create individual RShiny files for each of the three phases 
-#TODO 2: Connect the RShiny files for each of the three phases to the main file (app.R)
+library(data.table)
+library(tidyverse)
 
 #UI
 ui <- dashboardPage(
@@ -28,13 +28,31 @@ ui <- dashboardPage(
               )
       ),
       #PHASE 1
+      #      tabItem(tabName = "phase1",
+      #h2("Phase 1"),
+      #p("Content for Phase 1..."),
+      #selectInput("selection", "Choose an option:",
+                  #choices = c("Specificity Values(1062 traps) " = "specificity1",
+      #For our analysis, we consider a total of 1062 traps
+                              #"Sensitivity Values(326 traps)" = "sensitivity",
+                              #"Specificity Values(326 traps)" = "specificity2"))
+    #),
       tabItem(tabName = "phase1",
               h2("Phase 1"),
-              p("Content for Phase 1..."),
-              selectInput("selection", "Choose an option:",
-                          choices = c("Specificity Values(1062 traps) " = "specificity1",
-                                      "Sensitivity Values(326 traps)" = "sensitivity",
-                                      "Specificity Values(326 traps)" = "specificity2"))
+              fluidRow(
+                column(4,
+                       sliderInput(inputId = "yearRange", label = "Select Year Range:",
+                                   min = 2004, max = 2018, value = c(2004, 2018), step = 1),
+                       actionButton(inputId = "submitPhase1", label = "Submit")
+                ),
+                column(8,
+                       tabsetPanel(
+                         tabPanel("Map", plotOutput("mapPlot")),
+                         tabPanel("Data", tableOutput("dataView")),
+                         tabPanel("Analysis Results", tableOutput("analysisResults"))
+                       )
+                )
+              )
       ),
       #PHASE 2
       tabItem(tabName = "phase2",
@@ -51,7 +69,32 @@ ui <- dashboardPage(
 )
 
 #SERVER LOGIC
-server <- function(input, output) { }
+server <- function(input, output) {
+    processedDataPhase1 <- eventReactive(input$submitPhase1, {
+    yearRange <- str_split(input$yearRange, ",", simplify = TRUE)
+    yearRange <- as.numeric(yearRange)
+    dataList <- lapply(yearRange, preprocess_data)
+    do.call(rbind, dataList)
+  })
+  #NEED TO WRITE THIS METHOD FIRST - MAP CREATION
+  output$mapPlot <- renderPlot({
+    data <- processedDataPhase1()
+    generateMapPlot(data)  
+  })
+  
+  output$dataView <- renderTable({
+    data <- processedDataPhase1()
+    head(data)
+  })
+  
+  output$analysisResults <- renderTable({
+    data <- processedDataPhase1()
+    analysisResults <- performAnalysis(data) 
+    analysisResults
+  })
+  
+}
+
 
 shinyApp(ui = ui, server = server)
 
