@@ -3,7 +3,7 @@
 library(data.table)
 library(tidyverse)
 
-result_cv = fread("Phase1Results.csv") %>% 
+result_cv = fread("/Users/laura/Desktop/3phase_RShiny/Phase1Results.csv") %>% 
   as.data.frame
 result_cv = result_cv[,-1]
 colnames(result_cv)
@@ -78,7 +78,7 @@ result_cv[,startsWith(colnames(result_cv),"sensitivity")] = NULL
 # Attach it with the locations 
 preprocess_data = function(year){
   #Reading the data
-  path = paste("WNV data by year - Anwesha/",year,".csv",sep = "")
+  path = paste("/Users/laura/Desktop/3phase_RShiny/WVN\ by\ year/",year,".csv",sep = "")
   data = fread(path)
   # Converting the data into a data frame. 
   data = data.frame(apply(data,2,unlist))

@@ -8,6 +8,7 @@ library(ggplot2)
 library(RColorBrewer)
 library(tidyverse)
 library(rgdal)
+library(sf) #Alternative option might work...?
 library(ggmap)
 
 #-----------------Making the dataframe --------------------------------------------------------------

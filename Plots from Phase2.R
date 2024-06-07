@@ -7,8 +7,11 @@
 library(ggmap)
 library(RColorBrewer)
 
-trap_results = readRDS("trapAug2022.rds")
-trap_results_sens = readRDS("trapsensAug2022.rds")
+trap_results = readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
+trap_results_sens = readRDS("/Users/laura/Desktop/3phase_RShiny/trapsensAug2022.rds")
+
+#Stadia Maps API
+ggmap::register_stadiamaps(key = 'API_Key')
 
 ################## Plotting the locations #####################################
 map_bounds <- c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)

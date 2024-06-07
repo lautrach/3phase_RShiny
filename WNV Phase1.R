@@ -13,11 +13,11 @@ library(usa)
 library(splines)
 library(pbmcapply)
 library(ggmap)
-
+library(ggspatial)
 
 preprocess_data = function(year){
   #Reading the data
-  path = paste("WNV data by year - Anwesha/",year,".csv",sep = "")
+  path = paste("/Users/laura/Desktop/3phase_RShiny/WVN\ by\ year/", year ,".csv",sep = "")
   data = fread(path)
   # Converting the data into a data frame. 
   data = data.frame(apply(data,2,unlist))
