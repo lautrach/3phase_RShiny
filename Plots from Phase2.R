@@ -136,3 +136,4 @@ coords.map <- ggmap(coords.map, extent="device", legend="none")
                              aes(x=long, y=lat,colour = Trap_type),shape=19,
                              alpha=0.8,size = 2))
 
+
