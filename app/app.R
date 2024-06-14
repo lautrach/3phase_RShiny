@@ -37,7 +37,7 @@ ui <- dashboardPage(
               h2("Phase 1"),
               fluidRow(
                 column(4,
-                       fileInput("file1", "Choose RDS File", accept = ".rds"),  # File input for uploading RDS files
+                       fileInput("file1", "Choose RDS File", accept = ".rds"),  
                        actionButton("load", "Load Data")
                 ),
                 column(8,
@@ -71,7 +71,7 @@ server <- function(input, output) {
   })
   
   observeEvent(input$load, {
-    trap_results_sens <- trap_results()  # Use the uploaded data as trap_results_sens
+    trap_results_sens <- trap_results()  
   })
   
   output$loadedData <- renderTable({
@@ -102,7 +102,7 @@ server <- function(input, output) {
   
   output$analysisResults <- renderTable({
     req(trap_results())
-    trap_results()  # Display the uploaded data in the 'Analysis Results' tab
+    trap_results()
   })
 }
 
