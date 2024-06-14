@@ -7,7 +7,7 @@ library(ggmap)
 library(RColorBrewer)
 
 # Stadia Maps API 
-ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba')
+ggmap::register_stadiamaps(key = 'api_key') #probably need to figure something out for this...
 
 # UI
 ui <- dashboardPage(
