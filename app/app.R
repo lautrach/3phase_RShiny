@@ -1,3 +1,14 @@
+#app.R
+library(shiny)
+library(shinydashboard)
+library(data.table)
+library(tidyverse)
+library(ggmap)
+library(RColorBrewer)
+
+# Stadia Maps API 
+ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba')
+
 # UI
 ui <- dashboardPage(
   dashboardHeader(title = "3 Phase"),
@@ -55,12 +66,12 @@ ui <- dashboardPage(
 # SERVER LOGIC
 server <- function(input, output) {
   trap_results <- reactive({
-    req(input$file1)  
+    req(input$file1)  # Require that the file input is not NULL
     readRDS(input$file1$datapath)
   })
   
   observeEvent(input$load, {
-    trap_results_sens <- trap_results() 
+    trap_results_sens <- trap_results()  # Use the uploaded data as trap_results_sens
   })
   
   output$loadedData <- renderTable({
@@ -91,7 +102,7 @@ server <- function(input, output) {
   
   output$analysisResults <- renderTable({
     req(trap_results())
-    trap_results()  
+    trap_results()  # Display the uploaded data in the 'Analysis Results' tab
   })
 }
 
