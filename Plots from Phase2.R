@@ -11,7 +11,7 @@ trap_results = readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
 trap_results_sens = readRDS("/Users/laura/Desktop/3phase_RShiny/trapsensAug2022.rds")
 
 #Stadia Maps API
-ggmap::register_stadiamaps(key = 'API_Key')
+ggmap::register_stadiamaps(key = '170f7302-0a84-41f9-b560-ff13b8e1c647')
 
 ################## Plotting the locations #####################################
 map_bounds <- c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)

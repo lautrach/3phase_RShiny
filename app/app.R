@@ -7,9 +7,8 @@ library(ggmap)
 library(RColorBrewer)
 
 # Stadia Maps API 
-ggmap::register_stadiamaps(key = 'api_key') #probably need to figure something out for this...
+ggmap::register_stadiamaps(key = '170f7302-0a84-41f9-b560-ff13b8e1c647') #probably need to figure something out for this...
 
-# UI
 ui <- dashboardPage(
   dashboardHeader(title = "3 Phase"),
   dashboardSidebar(
@@ -43,6 +42,7 @@ ui <- dashboardPage(
                 column(8,
                        tabsetPanel(
                          tabPanel("Map", plotOutput("mapPlot")),
+                         tabPanel("Histogram", plotOutput("histogramPlot")),
                          tabPanel("Data", tableOutput("dataView")),
                          tabPanel("Analysis Results", tableOutput("analysisResults"))
                        )
@@ -83,16 +83,43 @@ server <- function(input, output) {
     map_bounds <- c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)
     coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
     coords.map <- ggmap(coords.map, extent = "device", legend = "none")
-    (coords.map <- coords.map + geom_point(data = data,  
-                                           aes(x = long, y = lat), 
+    (coords.map <- coords.map + geom_point(data = data,
+                                           aes(x = long, y = lat),
                                            fill = "green", shape = 23,
                                            alpha = 0.8, size = 1))
     return(coords.map)
   }
+
+  generateHistogram <- function(data) {
+    specihist <- ggplot(data = data, aes(x = avg_specificity)) +
+      geom_histogram(color = "darkgreen", fill = "lightgreen", alpha = 0.5, lwd = 1) +
+      geom_vline(aes(xintercept = mean(avg_specificity)),
+                 color = "blue", linetype = "dashed", size = 1) +
+      ggtitle("Histogram of Specificity values for Model 1")
+    return(specihist)
+  }
   
+  # generateMapPlot <- function(data){ 
+  # map_bounds <- c(left = -88.8, bottom = 41.3, right = -87.3, top = 42.4)
+  # coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
+  # coords.map <- ggmap(coords.map, extent="device", legend="none")
+  # coords.map <- coords.map %+% trap_results_sens + aes(x = long,y = lat,z = score) +
+  #   stat_summary_2d(fun = median,geom = "tile", 
+  #                   binwidth = c(0.028, 0.028),
+  #                   alpha = 0.80)+
+  #   scale_fill_gradientn(colours=(brewer.pal(7, "RdYlGn")))
+  # coords.map <- coords.map + theme_bw()
+  # return(coords.map)
+  # }
+  # 
   output$mapPlot <- renderPlot({
     req(trap_results())
     generateMapPlot(trap_results())
+  })
+
+  output$histogramPlot <- renderPlot({
+    req(trap_results())
+    generateHistogram(trap_results())
   })
   
   output$dataView <- renderTable({
