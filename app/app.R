@@ -7,7 +7,7 @@ library(ggmap)
 library(RColorBrewer)
 
 # Stadia Maps API 
-ggmap::register_stadiamaps(key = '170f7302-0a84-41f9-b560-ff13b8e1c647') #probably need to figure something out for this...
+ggmap::register_stadiamaps(key = 'API_KEY') #probably need to figure something out for this...
 
 ui <- dashboardPage(
   dashboardHeader(title = "3 Phase"),
@@ -41,8 +41,9 @@ ui <- dashboardPage(
                 ),
                 column(8,
                        tabsetPanel(
-                         tabPanel("Map", plotOutput("mapPlot")),
-                         tabPanel("Histogram", plotOutput("histogramPlot")),
+                         tabPanel("Plots", 
+                                  plotOutput("mapPlot"),
+                                  plotOutput("histogramPlot")),
                          tabPanel("Data", tableOutput("dataView")),
                          tabPanel("Analysis Results", tableOutput("analysisResults"))
                        )
