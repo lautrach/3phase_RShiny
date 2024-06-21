@@ -43,7 +43,9 @@ ui <- dashboardPage(
                        tabsetPanel(
                          tabPanel("Plots", 
                                   plotOutput("mapPlot"),
-                                  plotOutput("histogramPlot")),
+                                  plotOutput("histogramPlot1"),
+                                  plotOutput("histogramPlot2"),
+                                  plotOutput("histogramPlot3")),
                          tabPanel("Data", tableOutput("dataView")),
                          tabPanel("Analysis Results", tableOutput("analysisResults"))
                        )
@@ -53,7 +55,8 @@ ui <- dashboardPage(
       # PHASE 2
       tabItem(tabName = "phase2",
               h2("Phase 2"),
-              p("Content for Phase 2...")
+              tabPanel("Heatmap", 
+                       plotOutput("heatmapscore"))
       ),
       # PHASE 3
       tabItem(tabName = "phase3",
@@ -90,8 +93,9 @@ server <- function(input, output) {
                                            alpha = 0.8, size = 1))
     return(coords.map)
   }
-
-  generateHistogram <- function(data) {
+  
+  #Specificity atleast one case
+  generateHistogram1 <- function(data) {
     specihist <- ggplot(data = data, aes(x = avg_specificity)) +
       geom_histogram(color = "darkgreen", fill = "lightgreen", alpha = 0.5, lwd = 1) +
       geom_vline(aes(xintercept = mean(avg_specificity)),
@@ -99,28 +103,46 @@ server <- function(input, output) {
       ggtitle("Histogram of Specificity values for Model 1")
     return(specihist)
   }
+
+  #Specificity atleast one case
+  generateHistogram2 <- function(data){
+    specihist2 <- ggplot(data = trap_results_sens,aes(x= avg_specificity)) +
+      geom_histogram(color = "darkgreen",fill = "lightgreen",alpha = 0.5,lwd = 1)+
+      geom_vline(aes(xintercept=mean(avg_specificity)),
+                 color="blue", linetype="dashed", size=1) +
+      ggtitle("Histogram of Specificity values for traps with atleast one case Model 1") 
+    return(specihist2)
+  }
   
-  # generateMapPlot <- function(data){ 
-  # map_bounds <- c(left = -88.8, bottom = 41.3, right = -87.3, top = 42.4)
-  # coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
-  # coords.map <- ggmap(coords.map, extent="device", legend="none")
-  # coords.map <- coords.map %+% trap_results_sens + aes(x = long,y = lat,z = score) +
-  #   stat_summary_2d(fun = median,geom = "tile", 
-  #                   binwidth = c(0.028, 0.028),
-  #                   alpha = 0.80)+
-  #   scale_fill_gradientn(colours=(brewer.pal(7, "RdYlGn")))
-  # coords.map <- coords.map + theme_bw()
-  # return(coords.map)
-  # }
-  # 
+  #Sensitivity atleast one case
+  generateHistogram3 <- function(data){
+    sensihist <-ggplot(data = trap_results_sens,aes(x= avg_sensitivity)) +
+      geom_histogram(color = "darkgreen",fill = "lightgreen",alpha = 0.5,lwd = 1)+
+      geom_vline(aes(xintercept=mean(avg_specificity)),
+                 color="blue", linetype="dashed", size=1) +
+      ggtitle("Histogram of Sensitivity values for traps with atleast one case Model 1")
+    return(sensihist)
+  }
+  
+  
   output$mapPlot <- renderPlot({
     req(trap_results())
     generateMapPlot(trap_results())
   })
 
-  output$histogramPlot <- renderPlot({
+  output$histogramPlot1 <- renderPlot({
     req(trap_results())
-    generateHistogram(trap_results())
+    generateHistogram1(trap_results())
+  })
+  
+  output$histogramPlot2 <- renderPlot({
+    req(trap_results())
+    generateHistogram2(trap_results())
+  })
+  
+  output$histogramPlot3 <- renderPlot({
+    req(trap_results())
+    generateHistogram3(trap_results())
   })
   
   output$dataView <- renderTable({
@@ -132,6 +154,34 @@ server <- function(input, output) {
     req(trap_results())
     trap_results()
   })
+#phase2 plots
+  # heatmapscore <- function(data){
+  #   heatmap <- plot_heatmap = function(df,z = "specificity",binwidth_h=0.1,
+  #                                                        binwidth_v=0.1,fun=median,point_disp = F){
+  #   dat = df[c("lat","long",z)]
+  #   colnames(dat)[3] = "z" 
+  #   map_bounds <-  c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)
+  #   coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
+  #   coords.map <- ggmap(coords.map, extent="device", legend="none")
+  #   coords.map <- coords.map %+% dat + aes(x = long,y = lat,z = z) +
+  #     stat_summary_2d(fun = fun,geom = "tile", 
+  #                     binwidth = c(binwidth_h, binwidth_v),
+  #                     alpha = 0.5)+
+  #     scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
+  #   coords.map <- coords.map + theme_bw()
+  #   if(point_disp == T){
+  #     coords.map <- coords.map + geom_point(data=df,  
+  #                                           aes(x=long, y=lat), 
+  #                                           fill="red", shape=23,
+  #                                           alpha=0.8,size = 0.5)  
+  #   }
+  #   coords.map
+  #   return(heatmap)
+  # }
+  #   
+  # }
+  
+  
 }
 
 shinyApp(ui = ui, server = server)
