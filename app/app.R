@@ -8,7 +8,7 @@ library(RColorBrewer)
 library(DT)
 
 # Stadia Maps API 
-ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba') # we can look into leaflet -- no api needed look at commented code below
+ggmap::register_stadiamaps(key = 'API_KEY') # we can look into leaflet -- no api needed look at commented code below
 
 # UI
 ui <- dashboardPage(
