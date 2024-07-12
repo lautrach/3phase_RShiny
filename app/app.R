@@ -5,9 +5,10 @@ library(data.table)
 library(tidyverse)
 library(ggmap)
 library(RColorBrewer)
+library(DT)
 
 # Stadia Maps API 
-ggmap::register_stadiamaps(key = 'API_KEY') # we can look into leaflet -- no api needed look at commented code below
+ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba') # we can look into leaflet -- no api needed look at commented code below
 
 # UI
 ui <- dashboardPage(
@@ -55,8 +56,8 @@ ui <- dashboardPage(
                                   plotOutput("histogramPlot1"),
                                   plotOutput("histogramPlot2"),
                                   plotOutput("histogramPlot3")),
-                         tabPanel("Data", tableOutput("dataView")),
-                         tabPanel("Analysis Results", tableOutput("analysisResults"))
+                         tabPanel("Data", dataTableOutput("dataView")),
+                         tabPanel("Analysis Results", dataTableOutput("analysisResults"))
                        )
                 )
               )
@@ -71,8 +72,10 @@ ui <- dashboardPage(
                 ),
                 column(8,
                        tabsetPanel(
-                         tabPanel("Map", plotOutput("mapPhase2")),
-                         tabPanel("Data", tableOutput("dataPhase2"))
+                         tabPanel("Map", 
+                                  plotOutput("mapPhase2"),
+                                  plotOutput("histogramScore")),
+                         tabPanel("Data", dataTableOutput("dataPhase2"))
                        )
                 )
               )
@@ -164,18 +167,17 @@ server <- function(input, output) {
     generateHistogram3(trap_results())
   })
   
-  output$dataView <- renderTable({
+  output$dataView <- renderDataTable({
     req(trap_results())
-    head(trap_results())
+    datatable(trap_results(), options = list(scrollX = TRUE))
   })
   
-  output$analysisResults <- renderTable({
+  output$analysisResults <- renderDataTable({
     req(trap_results())
-    trap_results()
+    datatable(trap_results(), options = list(scrollX = TRUE))
   })
   
   # PHASE 2 SERVER 
-  #we might want to figure this out...
   rds_data <- reactive({
     readRDS("/Users/ram/Desktop/3phase_RShiny/trapAug2022.rds")
   })
@@ -209,10 +211,10 @@ server <- function(input, output) {
       labs(fill = "Score")
   })
   
-  output$dataPhase2 <- renderTable({
+  output$dataPhase2 <- renderDataTable({
     req(results_phase2())
-    head(results_phase2(), 10)  
-  }, class = "data")
+    datatable(results_phase2(), options = list(scrollX = TRUE))
+  })
   
   output$downloadData <- downloadHandler(
     filename = function() {
