@@ -9,7 +9,7 @@ library(leaflet)
 library(DT)
 
 # Stadia Maps API
-ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba') #We can switch to leaflet
+ggmap::register_stadiamaps(key = 'API_KEY') #We can switch to leaflet
 
 # UI
 ui <- dashboardPage(
@@ -32,15 +32,9 @@ ui <- dashboardPage(
       "))
     ),
     tabItems(
-      # HOME PAGE
+      # HOME PAGE (ABOUT PAGE)
       tabItem(tabName = "home",
-              h2("3 Phase application (change name/title later)"),
-              div(
-                h3("Purpose"),
-                p("Purpose of the application will go here..."),
-                h3("Usage"),
-                p("A brief outline of how to use the application will go here...")
-              )
+              includeMarkdown("about.Rmd")
       ),
       # PHASE 1
       tabItem(tabName = "phase1",

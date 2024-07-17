@@ -1,0 +1,17 @@
+# 3 Phase Application
+
+## Purpose
+
+## Usage
+
+The application is divided into three phases, each of which has a designated tab and can be navigated to using the bar on the left. Below are the detailed descriptions of what purpose each of the phases serves in the application. Visit the tab for the respective phase to learn more about the usage instructions for that particular phase.
+
+-   Phase 1:
+
+<!-- -->
+
+-   Phase 2:
+
+-   Phase 3:
+
+## Acknowledgements
