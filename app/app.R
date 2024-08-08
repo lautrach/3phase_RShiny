@@ -97,15 +97,17 @@ ui <- dashboardPage(
 )
 
 # SERVER LOGIC
-server <- function(input, output) {
+server <- function(input, output, session) {
   # PHASE 1 SERVER
   trap_results <- reactive({
     req(input$file1)  # Require that the file input is not NULL
     readRDS(input$file1$datapath)
   })
   
-  observeEvent(input$load, {
-    trap_results_sens <- trap_results()
+  trap_results_sens <- reactive({
+    trap_data <- trap_results()
+    trap_data_sens <- trap_data[trap_data$avg_specificity > 0, ]  # Filter data as needed
+    return(trap_data_sens)
   })
   
   output$loadedData <- renderTable({
@@ -124,7 +126,6 @@ server <- function(input, output) {
     return(coords.map)
   }
   
-  #Specificity atleast one case
   generateHistogram1 <- function(data) {
     specihist <- ggplot(data = data, aes(x = avg_specificity)) +
       geom_histogram(color = "darkgreen", fill = "lightgreen", alpha = 0.5, lwd = 1) +
@@ -134,9 +135,8 @@ server <- function(input, output) {
     return(specihist)
   }
   
-  #Specificity atleast one case
   generateHistogram2 <- function(data){
-    specihist2 <- ggplot(data = trap_results_sens, aes(x= avg_specificity)) +
+    specihist2 <- ggplot(data = data, aes(x = avg_specificity)) +
       geom_histogram(color = "darkgreen", fill = "lightgreen", alpha = 0.5, lwd = 1) +
       geom_vline(aes(xintercept=mean(avg_specificity)),
                  color="blue", linetype="dashed", size=1) +
@@ -144,12 +144,11 @@ server <- function(input, output) {
     return(specihist2)
   }
   
-  #Sensitivity atleast one case
   generateHistogram3 <- function(data){
-    sensihist <- ggplot(data = trap_results_sens, aes(x= avg_sensitivity)) +
+    sensihist <- ggplot(data = data, aes(x = avg_sensitivity)) +
       geom_histogram(color = "darkgreen", fill = "lightgreen", alpha = 0.5, lwd = 1) +
-      geom_vline(aes(xintercept=mean(avg_specificity)),
-                 color="blue", linetype="dashed", size=1) +
+      geom_vline(aes(xintercept = mean(avg_specificity)),
+                 color = "blue", linetype = "dashed", size = 1) +
       ggtitle("Histogram of Sensitivity values for traps with atleast one case Model 1")
     return(sensihist)
   }
@@ -165,13 +164,13 @@ server <- function(input, output) {
   })
   
   output$histogramPlot2 <- renderPlot({
-    req(trap_results())
-    generateHistogram2(trap_results())
+    req(trap_results_sens())
+    generateHistogram2(trap_results_sens())
   })
   
   output$histogramPlot3 <- renderPlot({
-    req(trap_results())
-    generateHistogram3(trap_results())
+    req(trap_results_sens())
+    generateHistogram3(trap_results_sens())
   })
   
   output$dataView <- renderDataTable({
