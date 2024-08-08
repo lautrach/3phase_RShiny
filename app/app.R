@@ -8,8 +8,7 @@ library(RColorBrewer)
 library(leaflet)
 library(DT)
 
-# Stadia Maps API
-ggmap::register_stadiamaps(key = 'API_KEY') #We can switch to leaflet
+ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba') #We can switch to leaflet
 
 # UI
 ui <- dashboardPage(
@@ -28,6 +27,9 @@ ui <- dashboardPage(
         table.data {
           width: 100% !important;
           overflow-x: auto !important;
+        }
+        .instructions {
+          margin-top: 20px;
         }
       "))
     ),
@@ -63,7 +65,17 @@ ui <- dashboardPage(
               fluidRow(
                 column(4,
                        fileInput("file2", "Choose CSV File", accept = ".csv"),
-                       downloadButton("downloadData", "Download Processed Data")
+                       downloadButton("downloadData", "Download Processed Data"),
+                       div(
+                         class = "instructions",
+                         tags$h4(tags$b("Usage Instructions")),
+                         tags$ul(
+                           tags$li("Choose a CSV file containing the results. Please make sure that this CSV file has a column for the longitude and latitude of traps for plotting purposes."),
+                           tags$li("Once the file is uploaded and read by the application, an interactive plot will be generated outputting the trap id, the longitude, the latitude and the calculated trap score."),
+                           tags$li("A new CSV file with an added", tags$i("score"), "column is available for downloaded and can be downloaded though the", tags$i("Download Processed Data"), "button"),
+                           tags$li("The", tags$i("Data"), "tab contains a snapshot of the first few rows of the downloadable CSV file.")
+                         )
+                       )
                 ),
                 column(8,
                        tabsetPanel(
@@ -91,16 +103,16 @@ server <- function(input, output) {
     req(input$file1)  # Require that the file input is not NULL
     readRDS(input$file1$datapath)
   })
-
+  
   observeEvent(input$load, {
     trap_results_sens <- trap_results()
   })
-
+  
   output$loadedData <- renderTable({
     req(trap_results())
     head(trap_results())
   })
-
+  
   generateMapPlot <- function(data) {
     map_bounds <- c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)
     coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
@@ -111,7 +123,7 @@ server <- function(input, output) {
                                           alpha = 0.8, size = 1)
     return(coords.map)
   }
-
+  
   #Specificity atleast one case
   generateHistogram1 <- function(data) {
     specihist <- ggplot(data = data, aes(x = avg_specificity)) +
@@ -121,7 +133,7 @@ server <- function(input, output) {
       ggtitle("Histogram of Specificity values for Model 1")
     return(specihist)
   }
-
+  
   #Specificity atleast one case
   generateHistogram2 <- function(data){
     specihist2 <- ggplot(data = trap_results_sens, aes(x= avg_specificity)) +
@@ -131,7 +143,7 @@ server <- function(input, output) {
       ggtitle("Histogram of Specificity values for traps with atleast one case Model 1")
     return(specihist2)
   }
-
+  
   #Sensitivity atleast one case
   generateHistogram3 <- function(data){
     sensihist <- ggplot(data = trap_results_sens, aes(x= avg_sensitivity)) +
@@ -141,37 +153,37 @@ server <- function(input, output) {
       ggtitle("Histogram of Sensitivity values for traps with atleast one case Model 1")
     return(sensihist)
   }
-
+  
   output$mapPlot <- renderPlot({
     req(trap_results())
     generateMapPlot(trap_results())
   })
-
+  
   output$histogramPlot1 <- renderPlot({
     req(trap_results())
     generateHistogram1(trap_results())
   })
-
+  
   output$histogramPlot2 <- renderPlot({
     req(trap_results())
     generateHistogram2(trap_results())
   })
-
+  
   output$histogramPlot3 <- renderPlot({
     req(trap_results())
     generateHistogram3(trap_results())
   })
-
+  
   output$dataView <- renderDataTable({
     req(trap_results())
     datatable(trap_results(), options = list(scrollX = TRUE))
   })
-
+  
   output$analysisResults <- renderDataTable({
     req(trap_results())
     datatable(trap_results(), options = list(scrollX = TRUE))
   })
-
+  
   # PHASE 2 SERVER
   rds_data <- reactive({
     readRDS("/Users/ram/Desktop/3phase_RShiny/trapAug2022.rds")
@@ -190,10 +202,10 @@ server <- function(input, output) {
         score = if_else(is.na(avg_specificity) | is.na(avg_sensitivity), NA_real_,
                         (0.9 * avg_specificity + avg_sensitivity) / 1.9)
       )
-
+    
     merged_data
   })
-
+  
   output$mapPhase2 <- renderLeaflet({
     req(results_phase2())
     data <- results_phase2()
@@ -212,12 +224,12 @@ server <- function(input, output) {
                 title = "Score",
                 opacity = 1)
   })
-
+  
   output$dataPhase2 <- renderDataTable({
     req(results_phase2())
     datatable(results_phase2(), options = list(scrollX = TRUE))
   })
-
+  
   output$downloadData <- downloadHandler(
     filename = function() {
       paste("processed_data_", Sys.Date(), ".csv", sep = "")
@@ -235,3 +247,4 @@ server <- function(input, output) {
 }
 
 shinyApp(ui = ui, server = server)
+
