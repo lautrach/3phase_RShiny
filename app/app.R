@@ -8,7 +8,7 @@ library(RColorBrewer)
 library(leaflet)
 library(DT)
 
-ggmap::register_stadiamaps(key = '74514459-ad00-4200-b3b6-807eede69fba') #We can switch to leaflet
+ggmap::register_stadiamaps(key = 'API_KEY') #We can switch to leaflet
 
 # UI
 ui <- dashboardPage(
@@ -44,7 +44,6 @@ ui <- dashboardPage(
               fluidRow(
                 column(4,
                        fileInput("file1", "Choose RDS File", accept = ".rds"),
-                       actionButton("load", "Load Data")
                 ),
                 column(8,
                        tabsetPanel(
