@@ -1,21 +1,18 @@
-# app.R
 library(shiny)
 library(shinydashboard)
 library(data.table)
 library(tidyverse)
-library(ggmap)
 library(RColorBrewer)
 library(leaflet)
 library(DT)
 
-ggmap::register_stadiamaps(key = 'API_KEY') #We can switch to leaflet
-
+# -- UI --
 # UI
 ui <- dashboardPage(
   dashboardHeader(title = "3 Phase"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Home", tabName = "home", icon = icon("home")),
+      menuItem("Home", tabName = "home"),
       menuItem("Phase 1", tabName = "phase1"),
       menuItem("Phase 2", tabName = "phase2"),
       menuItem("Phase 3", tabName = "phase3")
@@ -40,15 +37,22 @@ ui <- dashboardPage(
       ),
       # PHASE 1
       tabItem(tabName = "phase1",
-              h2("Phase 1"),
+              h2("Phase 1: Location of traps"),
               fluidRow(
                 column(4,
                        fileInput("file1", "Choose RDS File", accept = ".rds"),
+                       div(
+                         class = "instructions",
+                         tags$h4(tags$b("Usage Instructions")),
+                         tags$ul(
+                           tags$li("To-Do..."),
+                         )
+                       )
                 ),
                 column(8,
                        tabsetPanel(
-                         tabPanel("Plots",
-                                  plotOutput("mapPlot"),
+                         tabPanel("Map",
+                                  leafletOutput("mapPlot"),
                                   plotOutput("histogramPlot1"),
                                   plotOutput("histogramPlot2"),
                                   plotOutput("histogramPlot3")),
@@ -60,7 +64,7 @@ ui <- dashboardPage(
       ),
       # PHASE 2
       tabItem(tabName = "phase2",
-              h2("Phase 2"),
+              h2("Phase 2: Score of traps"),
               fluidRow(
                 column(4,
                        fileInput("file2", "Choose CSV File", accept = ".csv"),
@@ -95,17 +99,17 @@ ui <- dashboardPage(
   )
 )
 
-# SERVER LOGIC
+# -- SERVER LOGIC -- 
 server <- function(input, output, session) {
   # PHASE 1 SERVER
   trap_results <- reactive({
-    req(input$file1)  # Require that the file input is not NULL
+    req(input$file1)
     readRDS(input$file1$datapath)
   })
   
   trap_results_sens <- reactive({
     trap_data <- trap_results()
-    trap_data_sens <- trap_data[trap_data$avg_specificity > 0, ]  # Filter data as needed
+    trap_data_sens <- trap_data[trap_data$avg_specificity > 0, ]
     return(trap_data_sens)
   })
   
@@ -114,16 +118,20 @@ server <- function(input, output, session) {
     head(trap_results())
   })
   
-  generateMapPlot <- function(data) {
-    map_bounds <- c(left = -89.2, bottom = 41.3, right = -87.3, top = 42.7)
-    coords.map <- get_stadiamap(map_bounds, zoom = 9, maptype = "stamen_toner_lite")
-    coords.map <- ggmap(coords.map, extent = "device", legend = "none")
-    coords.map <- coords.map + geom_point(data = data,
-                                          aes(x = long, y = lat),
-                                          fill = "green", shape = 23,
-                                          alpha = 0.8, size = 1)
-    return(coords.map)
-  }
+  output$mapPlot <- renderLeaflet({
+    req(trap_results())  
+    data <- trap_results()
+    leaflet(data) %>%
+      addTiles() %>%
+      addCircleMarkers(
+        lng = ~long, lat = ~lat,
+        radius = 1,
+        color = "green",
+        stroke = TRUE,
+        fillOpacity = 0.7,
+        popup = ~paste("Trap ID:", ID, "<br>Lat:", lat, "<br>Long:", long)
+      )
+  })
   
   generateHistogram1 <- function(data) {
     specihist <- ggplot(data = data, aes(x = avg_specificity)) +
@@ -151,11 +159,6 @@ server <- function(input, output, session) {
       ggtitle("Histogram of Sensitivity values for traps with atleast one case Model 1")
     return(sensihist)
   }
-  
-  output$mapPlot <- renderPlot({
-    req(trap_results())
-    generateMapPlot(trap_results())
-  })
   
   output$histogramPlot1 <- renderPlot({
     req(trap_results())
@@ -211,11 +214,11 @@ server <- function(input, output, session) {
     leaflet(data) %>%
       addTiles() %>%
       addCircleMarkers(
-        ~long, ~lat,
-        radius = 5,
+        lng = ~long, lat = ~lat,
+        radius = 3,
         color = ~pal(score),
         stroke = TRUE,
-        fillOpacity = 0.7,
+        fillOpacity = 1.0,
         popup = ~paste("Trap ID:", ID, "<br>Score:", score, "<br>Lat:", lat, "<br>Long:", long)
       ) %>%
       addLegend("bottomright", pal = pal, values = ~score,
@@ -245,4 +248,7 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui = ui, server = server)
+
+
+
 
