@@ -1,2 +1,4 @@
 load("/Users/laura/Desktop/3phase_RShiny/app/trapAug2022.rds")
 load("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
+load("/Users/laura/Desktop/3phase_RShiny/app/trapAug2022.rds")
+load("/Users/laura/Desktop/3phase_RShiny/app/trapsensAug2022.rds")

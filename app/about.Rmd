@@ -6,12 +6,21 @@
 
 The application is divided into three phases, each of which has a designated tab and can be navigated to using the bar on the left. Below are the detailed descriptions of what purpose each of the phases serves in the application. Visit the tab for the respective phase to learn more about the usage instructions for that particular phase.
 
--   Phase 1:
+-   Phase 1: Model historic performance of the traps for predicting human cases <br>
 
-<!-- -->
 
--   Phase 2:
+    Phase 1 offers an overview of trap placements by providing a location map with traps.
+    
 
--   Phase 3:
+    The performance of the traps is measured using the sensitivity and specificity values as metrics, where both values will be presented in histograms. The sensitivity value presents the true positive rate, while the specificity value presents the true negative rate. 
+
+
+-   Phase 2: Define score for individual traps <br>
+
+    Phase 2 presents the calculated scores for individual traps, with the results displayed in a heatmap. This visualization offers a clear and concise view of the score distribution across all trap locations.
+
+-   Phase 3: Find characteristics of locations which correspond to higher trap scores.
+    
+    Phase 3 presents the location. 
 
 ## Acknowledgements

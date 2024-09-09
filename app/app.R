@@ -45,7 +45,8 @@ ui <- dashboardPage(
                          class = "instructions",
                          tags$h4(tags$b("Usage Instructions")),
                          tags$ul(
-                           tags$li("To-Do..."),
+                           tags$li("Choose an RDS file that contains the trap result. Please make sure that this RDS file has columns for the longitude and latitude of traps for plotting purposes. "),
+                           tags$li("After the file is uploaded and processed by the application, an interactive map will be generated displaying the trap ID, longitude, and latitude. Additionally, histograms representing sensitivity and specificity values will be provided."),
                          )
                        )
                 ),
@@ -187,7 +188,7 @@ server <- function(input, output, session) {
   
   # PHASE 2 SERVER
   rds_data <- reactive({
-    readRDS("/Users/ram/Desktop/3phase_RShiny/trapAug2022.rds")
+    readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
   })
   results_phase2 <- reactive({
     req(input$file2)
