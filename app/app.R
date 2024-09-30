@@ -93,15 +93,39 @@ ui <- dashboardPage(
       ),
       # PHASE 3
       tabItem(tabName = "phase3",
-              h2("Phase 3"),
-              p("Content for Phase 3...")
+              h2("Phase 3: Advanced Causal Analysis"),
+              fluidRow(
+                column(4,
+                       fileInput("file3", "Choose CSV File", accept = ".csv"),
+                       div(
+                         class = "instructions",
+                         tags$h4(tags$b("Usage Instructions")),
+                         tags$ul(
+                           tags$li("Upload a CSV file containing the predictor variables and the 'score'."),
+                           tags$li("Only columns with relevant predictor variables and the 'score' will be used."),
+                           tags$li("Rows with NA values in the 'score' column will be excluded from the analysis.")
+                         )
+                       )
+                ),
+                column(8,
+                       tabsetPanel(
+                         tabPanel("Summary", 
+                                  dataTableOutput("summaryTable")),
+                         tabPanel("Model Output", 
+                                  verbatimTextOutput("modelSummary")),
+                         tabPanel("Plots", 
+                                  plotOutput("gamPlots"))
+                       )
+                )
+              )
       )
     )
   )
 )
 
-# -- SERVER LOGIC -- 
+# -- SERVER LOGIC --
 server <- function(input, output, session) {
+  
   # PHASE 1 SERVER
   trap_results <- reactive({
     req(input$file1)
@@ -188,7 +212,7 @@ server <- function(input, output, session) {
   
   # PHASE 2 SERVER
   rds_data <- reactive({
-    readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
+    readRDS("/Users/ram/Desktop/3phase_RShiny/trapAug2022.rds")
   })
   results_phase2 <- reactive({
     req(input$file2)
@@ -246,6 +270,59 @@ server <- function(input, output, session) {
       })
     }
   )
+  
+  # PHASE 3 SERVER
+  data_phase3 <- reactive({
+    req(input$file3)
+    data <- fread(input$file3$datapath)
+    
+    selected_columns <- c("score", "TPOP2020", "AVG_IMP", "AVG_CANPY", "HSgradPct", 
+                          "FamPovPct", "Class_21Pct", 
+                          "Class_22Pct", "Class_23Pct", "Class_24Pct")
+    
+    data <- data[, ..selected_columns]
+    
+    data <- data[!is.na(score)]
+    
+    return(data)
+  })
+  
+  output$summaryTable <- renderDataTable({
+    req(data_phase3())
+    datatable(head(data_phase3(), 10), options = list(scrollX = TRUE))
+  })
+  
+  output$modelSummary <- renderPrint({
+    req(data_phase3())
+    data <- data_phase3()
+    
+    model <- gam(score ~ s(TPOP2020) + s(AVG_IMP) + s(AVG_CANPY) +
+                   s(HSgradPct) + s(FamPovPct) + s(Class_21Pct) + s(Class_22Pct) +
+                   s(Class_23Pct) + s(Class_24Pct), data = data)
+    
+    summary(model)
+  })
+  
+  output$gamPlots <- renderPlot({
+    req(data_phase3())
+    data <- data_phase3()
+    
+    model <- gam(score ~ s(TPOP2020) + s(AVG_IMP) + s(AVG_CANPY) +
+                   s(HSgradPct) + s(FamPovPct) + s(Class_21Pct) + s(Class_22Pct) +
+                   s(Class_23Pct) + s(Class_24Pct), data = data)
+    
+    par(mfrow = c(3, 4))
+    plot(model, pages = 1, shade = TRUE)
+  })
+  
+  output$correlationPlot <- renderPlot({
+    req(data_phase3())
+    data <- data_phase3()
+    
+    cor_matrix <- cor(data[, -1], use = "complete.obs")
+    
+    corrplot(cor_matrix, method = "circle")
+  })
 }
 
 shinyApp(ui = ui, server = server)
