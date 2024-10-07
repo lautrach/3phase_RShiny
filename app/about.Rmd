@@ -1,26 +1,73 @@
-# 3 Phase Application
+---
+title: "Trap Analysis Project"
+author: "Your Name"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    number_sections: true
+    css: "custom.css"
+---
+
+# **Three-Phase Application Overview**
+
+---
 
 ## Purpose
 
-## Usage
+<div style="padding: 15px; border-radius: 5px;">
+The primary objective of this application is to provide a comprehensive analysis of mosquito trap placements and identify locations with a high probability of predicting human cases of West Nile Virus (WNV). The project is divided into three distinct phases, each focusing on a unique aspect of trap analysis and optimization.
+</div>
 
-The application is divided into three phases, each of which has a designated tab and can be navigated to using the bar on the left. Below are the detailed descriptions of what purpose each of the phases serves in the application. Visit the tab for the respective phase to learn more about the usage instructions for that particular phase.
+## Application Usage Guide
 
--   Phase 1: Model historic performance of the traps for predicting human cases <br>
+This application is structured into three interactive phases, each accessible through its designated tab in the navigation panel on the left. Below is a detailed description of the purpose and methodology of each phase. Visit the respective tabs for more in-depth usage instructions and to explore interactive visualizations.
 
+### **Phase 1: Modeling Historic Trap Performance**
 
-    Phase 1 offers an overview of trap placements by providing a location map with traps.
-    
+<div style="padding: 10px;border-radius: 8px;">
+In this phase, a comprehensive analysis of historic trap performance is conducted. A **location map** visualizes the placement of traps, providing a clear spatial context. The performance of each trap is assessed using **sensitivity** and **specificity** values as key metrics, displayed through histograms:
 
-    The performance of the traps is measured using the sensitivity and specificity values as metrics, where both values will be presented in histograms. The sensitivity value presents the true positive rate, while the specificity value presents the true negative rate. 
+- **Sensitivity** captures the *true positive rate*, indicating how well the traps detect cases when present.
+- **Specificity** measures the *true negative rate*, reflecting the ability to correctly identify areas without cases.
 
+These metrics help gauge the historical reliability of traps in detecting WNV.
+</div>
 
--   Phase 2: Define score for individual traps <br>
+### **Phase 2: Defining Scores for Individual Traps**
 
-    Phase 2 presents the calculated scores for individual traps, with the results displayed in a heatmap. This visualization offers a clear and concise view of the score distribution across all trap locations.
+<div style="padding: 10px;  border-radius: 8px;">
+This phase calculates a **performance score** for each trap, which is visualized through an intuitive **heatmap**. The heatmap provides a clear representation of the score distribution across all trap locations, making it easy to identify high and low-performing traps.
+</div>
 
--   Phase 3: Find characteristics of locations which correspond to higher trap scores.
-    
-    Phase 3 presents the location. 
+### **Phase 3: Identifying Location Characteristics**
 
-## Acknowledgements
+<div style="padding: 10px;  border-radius: 8px;">
+In the final phase, a **Generalized Additive Model (GAM)** is employed to analyze which specific location characteristics are associated with higher trap scores. The following variables are considered in the analysis:
+
+- **Total Population (TPOP2020)**: Population density around trap locations.
+- **Average Impervious Surface (AVG_IMP)**: Percentage of impervious surfaces like roads and pavements.
+- **Average Canopy Coverage (AVG_CANPY)**: Tree canopy coverage in the vicinity.
+- **HSgradPct**: Percentage of high school graduates.
+- **Family Poverty Rate (FamPovPct)**: Socio-economic indicator of poverty levels.
+- **Land Classifications (Class_21Pct, Class_22Pct, Class_23Pct, Class_24Pct)**: Different categories of land use around the trap.
+
+The resulting plots from this model illustrate the relationships between these factors and trap performance, providing valuable insights into the environmental and socio-economic determinants of high-performing trap locations.
+</div>
+
+---
+
+## **Acknowledgements**
+
+### Citation
+<div style="padding: 10px;  border-radius: 5px;">
+*Where to place a mosquito trap for West Nile Virus surveillance?*  
+Anwesha Chakravarti, Bo Li, Dan Bartlett, Patrick Irwin, Rebecca Smith  
+*(Under Submission)*
+</div>
+
+### Funding
+<div style="padding: 10px;  border-radius: 5px;">
+This work was supported by Cooperative Agreement Number **U01CK000651** from the Centers for Disease Control and Prevention. Its contents are solely the responsibility of the authors and do not necessarily represent the official views of the Centers for Disease Control and Prevention or the Department of Health and Human Services.
+</div>

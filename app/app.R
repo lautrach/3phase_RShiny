@@ -9,7 +9,14 @@ library(DT)
 # -- UI --
 # UI
 ui <- dashboardPage(
-  dashboardHeader(title = "3 Phase"),
+  skin = "black",
+  dashboardHeader(
+    title = tags$div(
+      tags$img(src = "logo2.jpg", height = "48px", width = "44px", style = "margin-right: 10px;"),
+      "3 Phase"
+    )
+  ),
+  
   dashboardSidebar(
     sidebarMenu(
       menuItem("Home", tabName = "home"),
