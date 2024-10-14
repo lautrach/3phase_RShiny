@@ -5,6 +5,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(leaflet)
 library(DT)
+library(mgcv)
 
 # -- UI --
 # UI
@@ -219,7 +220,7 @@ server <- function(input, output, session) {
   
   # PHASE 2 SERVER
   rds_data <- reactive({
-    readRDS("/Users/ram/Desktop/3phase_RShiny/trapAug2022.rds")
+    readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
   })
   results_phase2 <- reactive({
     req(input$file2)

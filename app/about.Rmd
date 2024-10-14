@@ -10,7 +10,7 @@ output:
     css: "custom.css"
 ---
 
-# **Three-Phase Application Overview**
+# **Optimal Trap Placement Application Overview**
 
 ---
 
@@ -61,13 +61,13 @@ The resulting plots from this model illustrate the relationships between these f
 ## **Acknowledgements**
 
 ### Citation
-<div style="padding: 10px;  border-radius: 5px;">
-*Where to place a mosquito trap for West Nile Virus surveillance?*  
-Anwesha Chakravarti, Bo Li, Dan Bartlett, Patrick Irwin, Rebecca Smith  
-*(Under Submission)*
+<div style="padding: 10px; border-radius: 5px;">
+  <em>Where to place a mosquito trap for West Nile Virus surveillance?</em>  
+  Anwesha Chakravarti, Bo Li, Dan Bartlett, Patrick Irwin, Rebecca Smith  
+  <a href="https://arxiv.org/abs/2406.06920" target="_blank">Under Submission</a>
 </div>
 
 ### Funding
 <div style="padding: 10px;  border-radius: 5px;">
-This work was supported by Cooperative Agreement Number **U01CK000651** from the Centers for Disease Control and Prevention. Its contents are solely the responsibility of the authors and do not necessarily represent the official views of the Centers for Disease Control and Prevention or the Department of Health and Human Services.
+  This work was supported by Cooperative Agreement Number **U01CK000651** from the Centers for     Disease Control and Prevention. Its contents are solely the responsibility of the authors and    do not necessarily represent the official views of the Centers for Disease Control and           Prevention or the Department of Health and Human Services.
 </div>
