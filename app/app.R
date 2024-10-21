@@ -219,15 +219,10 @@ server <- function(input, output, session) {
   })
   
   # PHASE 2 SERVER
-  rds_data <- reactive({
-    readRDS("/Users/laura/Desktop/3phase_RShiny/trapAug2022.rds")
-  })
   results_phase2 <- reactive({
     req(input$file2)
     csv_data <- read.csv(input$file2$datapath)
-    rds_data <- rds_data()
-    merged_data <- merge(csv_data, rds_data[, c("ID", "lat", "long")], by = "ID")
-    merged_data <- merged_data %>%
+    merged_data <- csv_data %>%
       mutate(across(contains("specificity"), ~replace_na(.x, 0))) %>%
       mutate(across(contains("sensitivity"), ~replace_na(.x, 0))) %>%
       mutate(
@@ -236,18 +231,18 @@ server <- function(input, output, session) {
         score = if_else(is.na(avg_specificity) | is.na(avg_sensitivity), NA_real_,
                         (0.9 * avg_specificity + avg_sensitivity) / 1.9)
       )
-    
     merged_data
   })
-  
   output$mapPhase2 <- renderLeaflet({
     req(results_phase2())
     data <- results_phase2()
     pal <- colorNumeric(palette = "RdYlGn", domain = data$score, reverse = TRUE)
     leaflet(data) %>%
+      
       addTiles() %>%
+      
       addCircleMarkers(
-        lng = ~long, lat = ~lat,
+        lng = ~long, lat = ~lat,  
         radius = 3,
         color = ~pal(score),
         stroke = TRUE,
@@ -258,12 +253,10 @@ server <- function(input, output, session) {
                 title = "Score",
                 opacity = 1)
   })
-  
   output$dataPhase2 <- renderDataTable({
     req(results_phase2())
     datatable(results_phase2(), options = list(scrollX = TRUE))
   })
-  
   output$downloadData <- downloadHandler(
     filename = function() {
       paste("processed_data_", Sys.Date(), ".csv", sep = "")
