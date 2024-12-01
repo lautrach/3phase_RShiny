@@ -7,7 +7,6 @@ library(leaflet)
 library(DT)
 library(mgcv)
 # -- UI --
-# UI
 ui <- dashboardPage(
   skin = "black",
   dashboardHeader(
