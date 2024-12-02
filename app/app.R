@@ -103,12 +103,17 @@ ui <- dashboardPage(
               fluidRow(
                 column(4,
                        fileInput("file3", "Choose CSV File", accept = ".csv"),
+                       uiOutput("treatmentVarSelector"),
+                       actionButton("runModel", "Run Analysis", 
+                                    class = "btn-primary",
+                                    style = "margin-top: 10px"),
                        div(
                          class = "instructions",
                          tags$h4(tags$b("Usage Instructions")),
                          tags$ul(
-                           tags$li("Upload a CSV file containing the predictor variables and the 'score'."),
-                           tags$li("Only columns with relevant predictor variables and the 'score' will be used."),
+                           tags$li("Upload a CSV file containing predictor variables and the 'score' column."),
+                           tags$li("Select the predictor variables you want to include in the model."),
+                           tags$li("Click 'Run Analysis' to fit the GAM model and view results."),
                            tags$li("Rows with NA values in the 'score' column will be excluded from the analysis.")
                          )
                        )
@@ -120,7 +125,7 @@ ui <- dashboardPage(
                          tabPanel("Model Output", 
                                   verbatimTextOutput("modelSummary")),
                          tabPanel("Plots", 
-                                  plotOutput("gamPlots"))
+                                  plotOutput("gamPlots", height = "800px"))
                        )
                 )
               )
@@ -274,53 +279,61 @@ server <- function(input, output, session) {
   data_phase3 <- reactive({
     req(input$file3)
     data <- fread(input$file3$datapath)
-    
-    selected_columns <- c("score", "TPOP2020", "AVG_IMP", "AVG_CANPY", "HSgradPct", 
-                          "FamPovPct", "Class_21Pct", 
-                          "Class_22Pct", "Class_23Pct", "Class_24Pct")
-    
-    data <- data[, ..selected_columns]
-    
     data <- data[!is.na(score)]
-    
     return(data)
+  })
+  output$treatmentVarSelector <- renderUI({
+    req(data_phase3())
+    var_choices <- setdiff(names(data_phase3()), "score")
+    
+    selectizeInput(
+      "selectedVars",
+      "Select Treatment Variables",
+      choices = var_choices,
+      multiple = TRUE,
+      options = list(
+        plugins = list('remove_button'),
+        placeholder = 'Select variables...'
+      )
+    )
+  })
+  gam_formula <- reactive({
+    req(input$selectedVars)
+    smooth_terms <- paste0("s(", input$selectedVars, ")", collapse = " + ")
+    as.formula(paste("score ~", smooth_terms))
+  })
+  model_results <- reactiveVal(NULL)
+  observeEvent(input$runModel, {
+    req(data_phase3(), input$selectedVars, gam_formula())
+    model <- tryCatch({
+      gam(gam_formula(), data = data_phase3())
+    }, error = function(e) {
+      return(NULL)
+    })
+    
+    model_results(model)
   })
   
   output$summaryTable <- renderDataTable({
     req(data_phase3())
-    datatable(head(data_phase3(), 10), options = list(scrollX = TRUE))
+    selected_cols <- c("score", input$selectedVars)
+    datatable(
+      head(data_phase3()[, ..selected_cols], 10), 
+      options = list(scrollX = TRUE)
+    )
   })
   
   output$modelSummary <- renderPrint({
-    req(data_phase3())
-    data <- data_phase3()
-    
-    model <- gam(score ~ s(TPOP2020) + s(AVG_IMP) + s(AVG_CANPY) +
-                   s(HSgradPct) + s(FamPovPct) + s(Class_21Pct) + s(Class_22Pct) +
-                   s(Class_23Pct) + s(Class_24Pct), data = data)
-    
-    summary(model)
+    req(model_results())
+    summary(model_results())
   })
   
   output$gamPlots <- renderPlot({
-    req(data_phase3())
-    data <- data_phase3()
-    
-    model <- gam(score ~ s(TPOP2020) + s(AVG_IMP) + s(AVG_CANPY) +
-                   s(HSgradPct) + s(FamPovPct) + s(Class_21Pct) + s(Class_22Pct) +
-                   s(Class_23Pct) + s(Class_24Pct), data = data)
-    
-    par(mfrow = c(3, 4))
-    plot(model, pages = 1, shade = TRUE)
-  })
-  
-  output$correlationPlot <- renderPlot({
-    req(data_phase3())
-    data <- data_phase3()
-    
-    cor_matrix <- cor(data[, -1], use = "complete.obs")
-    
-    corrplot(cor_matrix, method = "circle")
+    req(model_results())
+    n_vars <- length(input$selectedVars)
+    n_rows <- ceiling(n_vars / 3) 
+    par(mfrow = c(n_rows, min(3, n_vars)))
+    plot(model_results(), pages = 1, shade = TRUE)
   })
 }
 
