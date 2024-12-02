@@ -106,7 +106,7 @@ ui <- dashboardPage(
                        uiOutput("treatmentVarSelector"),
                        actionButton("runModel", "Run Analysis", 
                                     class = "btn-primary",
-                                    style = "margin-top: 10px"),
+                                    style = "margin-top: 10px; color: white;"),
                        div(
                          class = "instructions",
                          tags$h4(tags$b("Usage Instructions")),
